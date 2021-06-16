@@ -1,5 +1,5 @@
 from red import DireccionamientoIP,subRedes
 
 if __name__ == "__main__":
-    DireccionamientoIP('150.84.32.245','255.255.255.240')
-    subRedes('192.168.1.0',3)
+    #DireccionamientoIP('192.168.128.0','255.255.248.0')
+    subRedes('10.0.0.0',9)

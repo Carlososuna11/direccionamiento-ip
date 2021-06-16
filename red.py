@@ -56,6 +56,9 @@ def rango(red,broadcast):
     final = broadcast[:last1] + '0' + broadcast[last1+1:0]
     return [begin,final]
 
+def encrypt(string, length):
+    return '.'.join(string[i:i+length] for i in range(0,len(string),length))
+
 def es_potencia_de_dos(numero):
     if numero < 1:
         return False
@@ -86,10 +89,14 @@ def subRedes(ip,cantidad,mask=None,):
     host=0
     direcciones = []
     if '1' in mask:
-        host = len(mask) - mask[::-1].index('1')+1
-    dir_mask_dec = convertirDecimal(mask[:host]+ numeros[-1] + mask[host+pos:])
+        host = len(mask.replace('.','')) - mask[::-1].replace('.','').index('1')
+    dir_mask_dec = convertirDecimal(encrypt(mask.replace('.','')[:host]+ numeros[-1] + mask.replace('.','')[host+pos:],8))
     for index,value in enumerate(numeros):
-        direcciones.append(convertirDecimal(red[:host]+ value + red[host+pos:]))
+        direcciones.append(convertirDecimal(encrypt(red.replace('.','')[:host]+ value + red.replace('.','')[host+pos:],8)))
+    host = 0
+    if '1' in convertirBinario(dir_mask_dec):
+        host = len(convertirBinario(dir_mask_dec).split('.')) -(len(convertirBinario(dir_mask_dec).split('.')) - convertirBinario(dir_mask_dec).replace('.','')[::-1].index('1'))
+    print(f'Hosts: 2^{host}-2 = {(2**(host))-2}\n')
     print(tabulate({'DIRECCIONES':direcciones},headers="keys",tablefmt="fancy_grid"))
     for index,value in enumerate(direcciones):
         print(f'\nDireccion {index+1}\n')
