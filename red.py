@@ -56,8 +56,45 @@ def rango(red,broadcast):
     final = broadcast[:last1] + '0' + broadcast[last1+1:0]
     return [begin,final]
 
-
+def es_potencia_de_dos(numero):
+    if numero < 1:
+        return False
+    if numero <= 2:
+        return True
+    i = 2
+    count =1
+    while True:
+        i *= 2
+        count+=1
+        if i == numero:
+            return [True,count]
+        if i > numero:
+            return False
 
 def DireccionamientoIP(ip,mask=None):
     data = direccionRed(ip,mask)
     print(tabulate(list(map(lambda x: [x[0],x[1],convertirDecimal(x[1])],data.items())),tablefmt="fancy_grid"))
+
+def subRedes(ip,cantidad,mask=None,):
+    data = direccionRed(ip,mask)
+    red = data['RED']
+    mask = data['MASCARA']
+    while not(es_potencia_de_dos(cantidad)):
+        cantidad+=1
+    pos = es_potencia_de_dos(cantidad)[1]
+    numeros = [format(x,f'0{pos}b') for x in range(cantidad)]
+    host=0
+    direcciones = []
+    if '1' in mask:
+        host = len(mask) - mask[::-1].index('1')+1
+    dir_mask_dec = convertirDecimal(mask[:host]+ numeros[-1] + mask[host+pos:])
+    for index,value in enumerate(numeros):
+        direcciones.append(convertirDecimal(red[:host]+ value + red[host+pos:]))
+    print(tabulate({'DIRECCIONES':direcciones},headers="keys",tablefmt="fancy_grid"))
+    for index,value in enumerate(direcciones):
+        print(f'\nDireccion {index+1}\n')
+        DireccionamientoIP(value,dir_mask_dec)
+        
+        
+
+
