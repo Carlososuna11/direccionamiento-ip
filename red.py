@@ -63,7 +63,7 @@ def es_potencia_de_dos(numero):
     if numero < 1:
         return False
     if numero <= 2:
-        return True
+        return [True,1]
     i = 2
     count =1
     while True:
