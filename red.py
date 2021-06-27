@@ -123,3 +123,43 @@ def subRedes(ip:str,cantidad:int,mask:str=None,maskbarra:int=None):
 
 
 
+def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
+    """
+    :params ip: Direccion IP
+    :param  cantidad: Cantidad de redes
+    :param hosts: hosts de cada subred
+    :param maskbarra: mascara en formato barra ej: 22
+    """
+    if len(hosts)!=cantidad:
+        print('ERROR, La cantidad de hosts no coincide con la de subredes')
+        exit()
+    if maskbarra:
+        mask = maskBarra(maskbarra)
+    data = direccionRed(ip,mask)
+    red = data['RED']
+    mask = data['MASCARA']
+    canthost = [2**(32-i)-2 for i in range(maskbarra+1,32)]
+    hosts.sort(reverse=True)
+    value =[]
+    masks = []
+    direcciones = []
+    for index,host in enumerate(hosts):
+        n = 0
+        for index2,pos in enumerate(canthost):
+            if host>pos:
+                break
+            n=index2
+        if index==0:
+            value.append(format(0,f'0{n+1}b'))
+        else:
+            val = int(value[-1],base=2)
+            val = format(val+1,f'0{len(value[-1])}b')
+            value.append(val+'0'*(n+1-len(value[-1])))
+        masks.append(value[-1].replace('0','1'))
+        dir_mask_dec = convertirDecimal(encrypt(mask.replace('.','')[:maskbarra]+ masks[-1] + mask.replace('.','')[maskbarra+n+1:],8))
+        dir = convertirDecimal(encrypt(red.replace('.','')[:maskbarra]+ value[-1] + red.replace('.','')[maskbarra+n+1:],8))
+        data = dict(map(lambda x: (x[0],convertirDecimal(x[1])), direccionRed(dir,dir_mask_dec).items()))
+        direcciones.append([f"{host} hosts de {canthost[n]}",dir,data['INICIO'],data['FIN'],data['BROADCAST'],data['MASCARA']])
+    print(tabulate(direcciones,headers=["RED","DIRECCION","PRIMER HOST","ULTIMO HOST","BROADCAST","MASCARA"],tablefmt="fancy_grid"))
+    # print(value)
+    # print(masks)
