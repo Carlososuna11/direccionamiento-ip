@@ -74,11 +74,29 @@ def es_potencia_de_dos(numero):
         if i > numero:
             return False
 
+def maskBarra(mask):
+    a = 32-mask
+    mask = '1'*mask + '0'*a
+    out = ''
+    for i in range(32):
+        out+=mask[i]
+        if i%8==7 and i>0:
+            out+='.'
+    return convertirDecimal(out[:-1])
+
 def DireccionamientoIP(ip,mask=None):
     data = direccionRed(ip,mask)
     print(tabulate(list(map(lambda x: [x[0],x[1],convertirDecimal(x[1])],data.items())),tablefmt="fancy_grid"))
 
-def subRedes(ip,cantidad,mask=None,):
+def subRedes(ip:str,cantidad:int,mask:str=None,maskbarra:int=None):
+    """
+    :params ip: Direccion IP
+    :param  cantidad: Cantidad de redes
+    :param mask: mascara a usar
+    :param maskbarra: mascara en formato barra ej: 22
+    """
+    if maskbarra:
+        mask = maskBarra(maskbarra)
     data = direccionRed(ip,mask)
     red = data['RED']
     mask = data['MASCARA']
@@ -102,6 +120,6 @@ def subRedes(ip,cantidad,mask=None,):
         print(f'\nDireccion {index+1}\n')
         DireccionamientoIP(value,dir_mask_dec)
         
-        
+
 
 
