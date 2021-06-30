@@ -124,6 +124,13 @@ def subRedes(ip:str,cantidad:int,mask:str=None,maskbarra:int=None):
 
 
 def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
+    octeto = {
+        9:1,
+        17:2,
+        25:3,
+        32:4
+    }
+    abecedario = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
     """
     :params ip: Direccion IP
     :param  cantidad: Cantidad de redes
@@ -143,6 +150,7 @@ def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
     value =[]
     masks = []
     direcciones = []
+    sumador = 0
     for index,host in enumerate(hosts):
         n = 0
         for index2,pos in enumerate(canthost):
@@ -156,10 +164,19 @@ def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
             val = format(val+1,f'0{len(value[-1])}b')
             value.append(val+'0'*(n+1-len(value[-1])))
         masks.append(value[-1].replace('0','1'))
+        if index==0:
+            for key,val in octeto.items():
+                if  maskbarra+n+1 < key:
+                    sumador=val
+                    break
+        a = encrypt(red.replace('.','')[:maskbarra]+ value[-1] + red.replace('.','')[maskbarra+n+1:],8)
+        b = convertirDecimal(encrypt(red.replace('.','')[:(sumador-1)*8],8))
+        #print(len(encrypt(red.replace('.','')[:(sumador-1)*8],8)))
+        #a= a[:maskbarra+n+sumador] + ' | ' + a[maskbarra+n+sumador:]
         dir_mask_dec = convertirDecimal(encrypt(mask.replace('.','')[:maskbarra]+ masks[-1] + mask.replace('.','')[maskbarra+n+1:],8))
         dir = convertirDecimal(encrypt(red.replace('.','')[:maskbarra]+ value[-1] + red.replace('.','')[maskbarra+n+1:],8))
+        print(f"{b}.{a[(sumador-1)*8:maskbarra+n+sumador]} | {a[maskbarra+n+sumador:]} ------> {dir}/{maskbarra+n+1}")
         data = dict(map(lambda x: (x[0],convertirDecimal(x[1])), direccionRed(dir,dir_mask_dec).items()))
-        direcciones.append([f"{host} hosts de {canthost[n]}",dir,data['INICIO'],data['FIN'],data['BROADCAST'],data['MASCARA']])
-    print(tabulate(direcciones,headers=["RED","DIRECCION","PRIMER HOST","ULTIMO HOST","BROADCAST","MASCARA"],tablefmt="fancy_grid"))
-    # print(value)
-    # print(masks)
+        direcciones.append([f"RED {abecedario[index].upper()}\n ({host} hosts)",canthost[n],dir,data['INICIO'],data['FIN'],data['BROADCAST'],data['MASCARA'],f"/{maskbarra+n+1}"])
+    print("\n")
+    print(tabulate(direcciones,headers=["RED","MAXIMO DE HOSTS","DIRECCION","PRIMER HOST","ULTIMO HOST","BROADCAST","MASCARA","FORMATO BARRA"],tablefmt="fancy_grid"))
