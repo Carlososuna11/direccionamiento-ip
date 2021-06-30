@@ -151,6 +151,7 @@ def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
     masks = []
     direcciones = []
     sumador = 0
+    sumador2 = 0
     for index,host in enumerate(hosts):
         n = 0
         for index2,pos in enumerate(canthost):
@@ -169,13 +170,17 @@ def vlsm(ip:str,cantidad:int,hosts:list,maskbarra:int=None):
                 if  maskbarra+n+1 < key:
                     sumador=val
                     break
+        for key,val in octeto.items():
+                if  maskbarra+n+1 < key:
+                    sumador2=val
+                    break
         a = encrypt(red.replace('.','')[:maskbarra]+ value[-1] + red.replace('.','')[maskbarra+n+1:],8)
         b = convertirDecimal(encrypt(red.replace('.','')[:(sumador-1)*8],8))
         #print(len(encrypt(red.replace('.','')[:(sumador-1)*8],8)))
         #a= a[:maskbarra+n+sumador] + ' | ' + a[maskbarra+n+sumador:]
         dir_mask_dec = convertirDecimal(encrypt(mask.replace('.','')[:maskbarra]+ masks[-1] + mask.replace('.','')[maskbarra+n+1:],8))
         dir = convertirDecimal(encrypt(red.replace('.','')[:maskbarra]+ value[-1] + red.replace('.','')[maskbarra+n+1:],8))
-        print(f"{b}.{a[(sumador-1)*8:maskbarra+n+sumador]} | {a[maskbarra+n+sumador:]} ------> {dir}/{maskbarra+n+1}")
+        print(f"{b}.{a[(sumador-1)*8:maskbarra+n+sumador2]} | {a[maskbarra+n+sumador2:]} ------> {dir}/{maskbarra+n+1}")
         data = dict(map(lambda x: (x[0],convertirDecimal(x[1])), direccionRed(dir,dir_mask_dec).items()))
         direcciones.append([f"RED {abecedario[index].upper()}\n ({host} hosts)",canthost[n],dir,data['INICIO'],data['FIN'],data['BROADCAST'],data['MASCARA'],f"/{maskbarra+n+1}"])
     print("\n")
